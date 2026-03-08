@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jobportal
+  namespace: default
+spec:
+  selector:
+    app: jobportal        # ← matches your deployment label
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080
+  type: NodePort          # ← exposes outside the cluster
