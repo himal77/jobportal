@@ -10,4 +10,5 @@ public class JagirApplication {
 		SpringApplication.run(JagirApplication.class, args);
 	}
 
+
 }
