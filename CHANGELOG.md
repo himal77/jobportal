@@ -1,5 +1,11 @@
 # jobportal
 
+## 3.3.0
+
+### Minor Changes
+
+- 0a800e9: testing blue green deployment
+
 ## 3.2.3
 
 ### Patch Changes
