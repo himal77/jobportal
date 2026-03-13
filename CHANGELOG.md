@@ -1,5 +1,11 @@
 # jobportal
 
+## 3.2.2
+
+### Patch Changes
+
+- 5d1621c: cicd fix
+
 ## 3.2.1
 
 ### Patch Changes
