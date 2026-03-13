@@ -1,5 +1,11 @@
 # jobportal
 
+## 3.3.1
+
+### Patch Changes
+
+- 8a84fd1: removed deployment.yaml
+
 ## 3.3.0
 
 ### Minor Changes
