@@ -1,5 +1,11 @@
 # jobportal
 
+## 3.3.2
+
+### Patch Changes
+
+- 2f48725: added just one get mapping
+
 ## 3.3.1
 
 ### Patch Changes
