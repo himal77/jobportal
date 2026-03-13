@@ -1,5 +1,11 @@
 # jobportal
 
+## 3.2.3
+
+### Patch Changes
+
+- 7be0bad: change checkout to main
+
 ## 3.2.2
 
 ### Patch Changes
