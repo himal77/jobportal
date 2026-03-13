@@ -7,7 +7,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class JobController {
 
     @GetMapping("/jobs")
-    public String health() {
+    public String jobs() {
         return "no jobs posted yet";
+    }
+
+    @GetMapping("/created")
+    public String health() {
+        return "Trying to create job";
     }
 }
