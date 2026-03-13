@@ -1,5 +1,12 @@
 # jobportal
 
+## 3.0.1
+
+### Patch Changes
+
+- 4ee0927: removed db connection for now
+- 4fea002: removed job model for now
+
 ## 3.0.0
 
 ### Major Changes
