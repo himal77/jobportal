@@ -1,5 +1,16 @@
 # jobportal
 
+## 2.0.0
+
+### Major Changes
+
+- 4621f12: added job model
+- 4621f12: added kubernetes service and deployment file
+
+### Patch Changes
+
+- 4621f12: removed test
+
 ## 1.2.0
 
 ### Minor Changes
