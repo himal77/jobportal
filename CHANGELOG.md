@@ -1,5 +1,11 @@
 # jobportal
 
+## 3.1.0
+
+### Minor Changes
+
+- e2b0597: added blue green deployment
+
 ## 3.0.1
 
 ### Patch Changes
