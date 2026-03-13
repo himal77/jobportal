@@ -1,0 +1,5 @@
+---
+"jobportal": major
+---
+
+added argocd

@@ -9,6 +9,4 @@ public class JagirApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(JagirApplication.class, args);
 	}
-
-
 }
