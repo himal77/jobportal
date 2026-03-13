@@ -6,7 +6,7 @@ metadata:
 spec:
   selector:
     app: jobportal
-    version: blue
+    version: green
   ports:
     - port: 8080
       targetPort: 8080
