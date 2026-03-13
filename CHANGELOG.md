@@ -1,5 +1,11 @@
 # jobportal
 
+## 3.2.1
+
+### Patch Changes
+
+- df84105: added pat token
+
 ## 3.2.0
 
 ### Minor Changes
