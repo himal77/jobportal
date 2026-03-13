@@ -1,5 +1,11 @@
 # jobportal
 
+## 3.2.0
+
+### Minor Changes
+
+- 7554e5d: seperated deploy and release
+
 ## 3.1.0
 
 ### Minor Changes
