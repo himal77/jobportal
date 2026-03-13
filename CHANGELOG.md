@@ -1,5 +1,11 @@
 # jobportal
 
+## 3.0.0
+
+### Major Changes
+
+- b4b98fb: added argocd
+
 ## 2.0.0
 
 ### Major Changes
