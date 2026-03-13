@@ -16,6 +16,10 @@ jobs:
       version: ${{ steps.version.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          ref: main                        # ← checkout main branch not the tag
+          fetch-depth: 0
 
       - name: Get version from tag
         id: version
@@ -90,4 +94,4 @@ jobs:
           git config user.name 'GitHub Actions'
           git add k8s/
           git commit -m "ci: switch to ${{ steps.switch.outputs.NEW_COLOR }} ${{ steps.version.outputs.VERSION }} [skip ci]"
-          git push
+          git push origin main
