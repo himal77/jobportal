@@ -1,0 +1,68 @@
+name: Deploy
+on:
+  workflow_run:
+    workflows: [Docker]
+    types: [completed]
+
+env:
+  DOCKER_IMAGE: himal77/jobportal
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get version
+        id: version
+        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Detect active color and switch
+        id: switch
+        run: |
+          # read current active color from service.yaml
+          CURRENT=$(grep 'version:' k8s/service.yaml | awk '{print $2}')
+          echo "Current active: $CURRENT"
+
+          # switch to opposite color
+          if [ "$CURRENT" = "blue" ]; then
+            NEW_COLOR="green"
+            STANDBY_COLOR="blue"
+          else
+            NEW_COLOR="blue"
+            STANDBY_COLOR="green"
+          fi
+
+          echo "Switching to: $NEW_COLOR"
+          echo "NEW_COLOR=$NEW_COLOR" >> $GITHUB_OUTPUT
+          echo "STANDBY_COLOR=$STANDBY_COLOR" >> $GITHUB_OUTPUT
+
+      - name: Update new color deployment with latest image
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          NEW_COLOR=${{ steps.switch.outputs.NEW_COLOR }}
+          
+          # update the inactive deployment with new image
+          sed -i 's|image:.*|image: '$DOCKER_IMAGE:$VERSION'|' k8s/deployment-$NEW_COLOR.yaml
+
+      - name: Switch service to new color
+        run: |
+          NEW_COLOR=${{ steps.switch.outputs.NEW_COLOR }}
+          
+          # point service to new color
+          sed -i "s|version:.*|version: $NEW_COLOR|" k8s/service.yaml
+
+      - name: Commit and push
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          NEW_COLOR=${{ steps.switch.outputs.NEW_COLOR }}
+          STANDBY_COLOR=${{ steps.switch.outputs.STANDBY_COLOR }}
+
+          git config user.email 'ci@github.com'
+          git config user.name 'GitHub Actions'
+          git add k8s/
+          git commit -m "ci: switch traffic from $STANDBY_COLOR to $NEW_COLOR ($VERSION) [skip ci]"
+          git push

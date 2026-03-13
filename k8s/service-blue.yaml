@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: jobportal
+  name: jobportal-blue
   namespace: default
 spec:
   selector:
@@ -10,5 +10,5 @@ spec:
   ports:
     - port: 8080
       targetPort: 8080
-      nodePort: 30080
-  type: NodePort          # ← exposes outside the cluster
+      nodePort: 30081   # ← localhost:30081 (if kind config has this port)
+  type: NodePort
