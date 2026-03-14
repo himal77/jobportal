@@ -19,6 +19,12 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
+          env:
+            - name: SPRING_DATA_MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongodb-uri       # ← reads from secret ✅
           resources:
             requests:
               memory: '256Mi'

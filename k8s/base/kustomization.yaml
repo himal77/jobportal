@@ -3,3 +3,6 @@ kind: Kustomization
 resources:
   - deployment.yaml
   - service.yaml
+  - mongodb/secret.yaml
+  - mongodb/statefulset.yaml
+  - mongodb/service.yaml
