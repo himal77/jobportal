@@ -1,5 +1,11 @@
 # jobportal
 
+## 4.0.1
+
+### Patch Changes
+
+- e8dfe49: fix namespace issue in patch files
+
 ## 4.0.0
 
 ### Major Changes
