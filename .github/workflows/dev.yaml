@@ -55,22 +55,3 @@ jobs:
           git add k8s/overlays/dev/kustomization.yaml
           git commit -m "chore: deploy ${{ steps.version.outputs.VERSION }} to dev [skip ci]"
           git push origin dev
-
-  # ── auto merge dev to staging after success ──────────────────────────────
-  promote-to-staging:
-    needs: build-deploy-dev
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.PAT_TOKEN }}
-          fetch-depth: 0
-
-      - name: Merge dev into staging
-        run: |
-          git config user.email 'ci@github.com'
-          git config user.name 'GitHub Actions'
-          git fetch origin
-          git checkout staging
-          git merge origin/dev --no-ff -m "chore: auto promote dev to staging [skip ci]"
-          git push origin staging
