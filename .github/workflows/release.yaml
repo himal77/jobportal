@@ -39,37 +39,26 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
-      - name: Check if changeset exists
-        id: check
-        run: |
-          if [ -n "$(ls .changeset/*.md 2>/dev/null | grep -v README)" ]; then
-            echo "HAS_CHANGESET=true" >> $GITHUB_OUTPUT
-          else
-            echo "HAS_CHANGESET=false" >> $GITHUB_OUTPUT
-          fi
-          
-      - name: Version bump and push
-        if: steps.check.outputs.HAS_CHANGESET == 'true'
-        run: |
-          changeset version
-          VERSION=$(node -p "require('./package.json').version")
-          git config user.email 'ci@github.com'
-          git config user.name 'GitHub Actions'
-          git add .
-          git commit -m "chore: release $VERSION [skip ci]"
-          git tag v$VERSION
-          git push origin main --follow-tags
-
-      - name: Sync version to pom.xml       # ← runs after version bump
-        if: steps.check.outputs.HAS_CHANGESET == 'true'
+      - name: Sync version to pom.xml
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           mvn versions:set -DnewVersion=$VERSION -DgenerateBackupPoms=false
 
-      - name: Commit pom.xml version bump
-        if: steps.check.outputs.HAS_CHANGESET == 'true'
+      - name: Commit pom.xml if changed
         run: |
+          git config user.email 'ci@github.com'
+          git config user.name 'GitHub Actions'
           git add pom.xml
-          git diff --staged --quiet || git commit -m "chore: bump pom.xml to ${{ env.VERSION }} [skip ci]"
-          git push origin main
+          git diff --staged --quiet && echo "no changes" || git commit -m "chore: sync pom.xml to ${{ env.VERSION }} [skip ci]"
+
+      - name: Tag and push
+        run: |
+          VERSION=${{ env.VERSION }}
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "Tag v$VERSION already exists, skipping"
+          else
+            echo "Creating tag v$VERSION"
+            git tag v$VERSION
+            git push origin main --follow-tags
+          fi
