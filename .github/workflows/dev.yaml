@@ -9,8 +9,7 @@ env:
   DOCKER_IMAGE: himal77/jobportal
 
 jobs:
-  # ─── Job 1: Docker ───────────────────────────────────────────────────────
-  docker:
+  build-deploy-dev:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.VERSION }}
@@ -18,14 +17,11 @@ jobs:
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.PAT_TOKEN }}
-          ref: main                        # ← checkout main branch not the tag
           fetch-depth: 0
 
-      - name: Get version from tag
+      - name: Set short SHA version
         id: version
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        run: echo "VERSION=dev-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - uses: actions/setup-java@v3
         with:
@@ -44,30 +40,33 @@ jobs:
         run: |
           VERSION=${{ steps.version.outputs.VERSION }}
           docker build -t $DOCKER_IMAGE:$VERSION .
-          docker tag $DOCKER_IMAGE:$VERSION $DOCKER_IMAGE:latest
           docker push $DOCKER_IMAGE:$VERSION
-          docker push $DOCKER_IMAGE:latest
 
-    # ─── Job 2: Deploy to Dev (automatic) ────────────────────────────────────
-  deploy-dev:
-    needs: docker
+      - name: Update dev kustomization
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          sed -i "s|newTag:.*|newTag: \"$VERSION\"|" k8s/overlays/dev/kustomization.yaml
+          git config user.email 'ci@github.com'
+          git config user.name 'GitHub Actions'
+          git add k8s/overlays/dev/kustomization.yaml
+          git commit -m "chore: deploy ${{ steps.version.outputs.VERSION }} to dev [skip ci]"
+          git push origin dev
+
+  # ── auto merge dev to staging after success ──────────────────────────────
+  promote-to-staging:
+    needs: build-deploy-dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.PAT_TOKEN }}
-          ref: main
           fetch-depth: 0
 
-      - name: Update dev image tag
-        run: |
-          VERSION=${{ needs.docker.outputs.version }}
-          sed -i "s|newTag:.*|newTag: \"$VERSION\"|" k8s/overlays/dev/kustomization.yaml
-
-      - name: Commit and push
+      - name: Merge dev into staging
         run: |
           git config user.email 'ci@github.com'
           git config user.name 'GitHub Actions'
-          git add k8s/overlays/dev/kustomization.yaml
-          git commit -m "ci: deploy ${{ needs.docker.outputs.version }} to dev [skip ci]"
-          git push origin HEAD:main
+          git fetch origin
+          git checkout staging
+          git merge origin/dev --no-ff -m "chore: auto promote dev to staging [skip ci]"
+          git push origin staging

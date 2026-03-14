@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
 
 jobs:
   release:
@@ -20,6 +20,12 @@ jobs:
         with:
           node-version: 18
 
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
       - name: Install dependencies
         run: npm install -g @changesets/cli
 
@@ -31,3 +37,24 @@ jobs:
           createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+      - name: Sync version to pom.xml
+        if: steps.changesets.outputs.hasChangesets == 'false'   # ← only when release PR is merged
+        run: |
+          # get version from package.json (changesets updates this)
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Syncing version $VERSION to pom.xml"
+          
+          # update pom.xml version
+          mvn versions:set -DnewVersion=$VERSION -DgenerateBackupPoms=false
+          
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Commit pom.xml version bump
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        run: |
+          git config user.email 'ci@github.com'
+          git config user.name 'GitHub Actions'
+          git add pom.xml
+          git diff --staged --quiet || git commit -m "chore: bump pom.xml to ${{ env.VERSION }} [skip ci]"
+          git push origin dev
