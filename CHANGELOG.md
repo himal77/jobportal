@@ -4,6 +4,8 @@
 
 ### Major Changes
 
+
+- 78f25ed: simplified workflow and deplyoment
 - 1297f38: removed staging just dev and prod
 
 ## 4.4.0
