@@ -1,5 +1,16 @@
 # jobportal
 
+## 4.4.0
+
+### Minor Changes
+
+- 0e54096: changed versioning in develop
+
+### Patch Changes
+
+- 20f1f9e: fix in release yaml
+- 34a90bc: added version in kustomization
+
 ## 4.3.2
 
 ### Patch Changes
