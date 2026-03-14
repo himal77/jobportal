@@ -1,0 +1,5 @@
+---
+"jobportal": minor
+---
+
+simpliefied
