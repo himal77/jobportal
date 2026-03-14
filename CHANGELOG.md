@@ -1,5 +1,11 @@
 # jobportal
 
+## 4.2.1
+
+### Patch Changes
+
+- ad07b89: validaiton in version of staging
+
 ## 4.2.0
 
 ### Minor Changes
