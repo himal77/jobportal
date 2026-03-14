@@ -21,6 +21,19 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Fetch all tags
+        run: git fetch --tags
+
+      - name: Validate version exists as git tag
+        run: |
+          VERSION=${{ github.event.inputs.version }}
+          if ! git tag | grep -q "^v$VERSION$"; then
+            echo "❌ Tag v$VERSION does not exist. Available tags:"
+            git tag | sort -V | tail -10    # ← shows last 10 tags
+            exit 1
+          fi
+          echo "✅ Tag v$VERSION exists"
+
       - name: Update staging image tag
         run: |
           sed -i "s|newTag:.*|newTag: \"${{ github.event.inputs.version }}\"|" k8s/overlays/staging/kustomization.yaml
