@@ -1,0 +1,52 @@
+name: Deploy Prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy (e.g. 4.1.1)'
+        required: true
+
+env:
+  DOCKER_IMAGE: himal77/jobportal
+
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-latest
+    environment: production    # ← manual approval gate
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          ref: main
+          fetch-depth: 0
+
+      - name: Detect active color and switch
+        id: switch
+        run: |
+          CURRENT=$(grep 'version:' k8s/overlays/prod/service-patch.yaml | awk '{print $2}')
+          if [ "$CURRENT" = "blue" ]; then
+            NEW_COLOR="green"
+          else
+            NEW_COLOR="blue"
+          fi
+          echo "NEW_COLOR=$NEW_COLOR" >> $GITHUB_OUTPUT
+
+      - name: Update prod image tag for new color
+        run: |
+          VERSION=${{ github.event.inputs.version }}
+          NEW_COLOR=${{ steps.switch.outputs.NEW_COLOR }}
+          sed -i "/name: jobportal-$NEW_COLOR/{n;s|newTag:.*|newTag: \"$VERSION\"|}" k8s/overlays/prod/kustomization.yaml
+
+      - name: Switch service to new color
+        run: |
+          NEW_COLOR=${{ steps.switch.outputs.NEW_COLOR }}
+          sed -i "s|version:.*|version: $NEW_COLOR|" k8s/overlays/prod/service-patch.yaml
+
+      - name: Commit and push
+        run: |
+          git config user.email 'ci@github.com'
+          git config user.name 'GitHub Actions'
+          git add k8s/overlays/prod/
+          git commit -m "ci: switch prod to ${{ steps.switch.outputs.NEW_COLOR }} ${{ github.event.inputs.version }} [skip ci]"
+          git push origin HEAD:main

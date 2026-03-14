@@ -5,7 +5,6 @@ metadata:
 spec:
   selector:
     app: jobportal
-    version: blue        # ← default, gets overridden by service-patch.yaml
   ports:
     - port: 8080
       targetPort: 8080
