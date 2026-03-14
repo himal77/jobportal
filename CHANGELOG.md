@@ -1,5 +1,11 @@
 # jobportal
 
+## 5.1.2
+
+### Patch Changes
+
+- ca58886: fixing release
+
 ## 5.1.1
 
 ### Patch Changes

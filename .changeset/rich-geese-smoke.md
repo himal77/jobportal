@@ -1,5 +1,0 @@
----
-"jobportal": patch
----
-
-fixing release
