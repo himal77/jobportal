@@ -39,26 +39,33 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
-      - name: Sync version to pom.xml
+      - name: Sync pom.xml version from package.json
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Syncing version $VERSION to pom.xml"
+
+          # update pom.xml
           mvn versions:set -DnewVersion=$VERSION -DgenerateBackupPoms=false
 
-      - name: Commit pom.xml if changed
-        run: |
-          git config user.email 'ci@github.com'
-          git config user.name 'GitHub Actions'
-          git add pom.xml
-          git diff --staged --quiet && echo "no changes" || git commit -m "chore: sync pom.xml to ${{ env.VERSION }} [skip ci]"
+          # verify it worked
+          echo "pom.xml version is now:"
+          mvn help:evaluate -Dexpression=project.version -q -DforceStdout
 
-      - name: Tag and push
+      - name: Commit and tag
         run: |
           VERSION=${{ env.VERSION }}
+          git config user.email 'ci@github.com'
+          git config user.name 'GitHub Actions'
+
+          # commit pom.xml change
+          git add pom.xml
+          git diff --staged --quiet && echo "pom.xml unchanged" || git commit -m "chore: sync pom.xml to $VERSION [skip ci]"
+
+          # create tag
           if git rev-parse "v$VERSION" >/dev/null 2>&1; then
-            echo "Tag v$VERSION already exists, skipping"
+            echo "Tag v$VERSION already exists skipping"
           else
-            echo "Creating tag v$VERSION"
             git tag v$VERSION
             git push origin main --follow-tags
           fi
