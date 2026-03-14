@@ -1,5 +1,11 @@
 # jobportal
 
+## 4.2.3
+
+### Patch Changes
+
+- 308542a: added deployment in kustomization
+
 ## 4.2.2
 
 ### Patch Changes
