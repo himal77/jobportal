@@ -1,5 +1,11 @@
 # jobportal
 
+## 4.0.0
+
+### Major Changes
+
+- f9291c4: seperate prod stag and dev version
+
 ## 3.3.2
 
 ### Patch Changes
