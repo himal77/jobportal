@@ -1,5 +1,15 @@
 # jobportal
 
+## 4.2.0
+
+### Minor Changes
+
+- 13ec67f: added seperate github action
+
+### Patch Changes
+
+- 654834f: fix version issue with image
+
 ## 4.1.1
 
 ### Patch Changes
