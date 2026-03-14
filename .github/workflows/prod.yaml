@@ -11,9 +11,9 @@ env:
   DOCKER_IMAGE: himal77/jobportal
 
 jobs:
-  deploy-prod:
+  deploy-staging:
     runs-on: ubuntu-latest
-    environment: production    # ← manual approval gate
+    environment: prod       # ← manual approval gate
     steps:
       - uses: actions/checkout@v3
         with:
@@ -21,32 +21,27 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Detect active color and switch
-        id: switch
-        run: |
-          CURRENT=$(grep 'version:' k8s/overlays/prod/service-patch.yaml | awk '{print $2}')
-          if [ "$CURRENT" = "blue" ]; then
-            NEW_COLOR="green"
-          else
-            NEW_COLOR="blue"
-          fi
-          echo "NEW_COLOR=$NEW_COLOR" >> $GITHUB_OUTPUT
+      - name: Fetch all tags
+        run: git fetch --tags
 
-      - name: Update prod image tag for new color
+      - name: Validate version exists as git tag
         run: |
           VERSION=${{ github.event.inputs.version }}
-          NEW_COLOR=${{ steps.switch.outputs.NEW_COLOR }}
-          sed -i "/name: jobportal-$NEW_COLOR/{n;s|newTag:.*|newTag: \"$VERSION\"|}" k8s/overlays/prod/kustomization.yaml
+          if ! git tag | grep -q "^v$VERSION$"; then
+            echo "❌ Tag v$VERSION does not exist. Available tags:"
+            git tag | sort -V | tail -10    # ← shows last 10 tags
+            exit 1
+          fi
+          echo "✅ Tag v$VERSION exists"
 
-      - name: Switch service to new color
+      - name: Update prod image tag
         run: |
-          NEW_COLOR=${{ steps.switch.outputs.NEW_COLOR }}
-          sed -i "s|version:.*|version: $NEW_COLOR|" k8s/overlays/prod/service-patch.yaml
+          sed -i "s|newTag:.*|newTag: \"${{ github.event.inputs.version }}\"|" k8s/overlays/prod/kustomization.yaml
 
       - name: Commit and push
         run: |
           git config user.email 'ci@github.com'
           git config user.name 'GitHub Actions'
-          git add k8s/overlays/prod/
-          git commit -m "ci: switch prod to ${{ steps.switch.outputs.NEW_COLOR }} ${{ github.event.inputs.version }} [skip ci]"
+          git add k8s/overlays/prod/kustomization.yaml
+          git commit -m "ci: deploy ${{ github.event.inputs.version }} to staging [skip ci]"
           git push origin HEAD:main

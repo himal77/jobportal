@@ -17,11 +17,4 @@ patches:
         value: 1
     target:
       kind: Deployment
-      name: jobportal-blue
-  - patch: |-
-      - op: replace
-        path: /spec/replicas
-        value: 1
-    target:
-      kind: Deployment
-      name: jobportal-green
+      name: jobportal
