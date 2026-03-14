@@ -1,5 +1,11 @@
 # jobportal
 
+## 4.3.2
+
+### Patch Changes
+
+- 0c3fed2: adjustment
+
 ## 4.3.1
 
 ### Patch Changes
