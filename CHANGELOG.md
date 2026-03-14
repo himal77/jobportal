@@ -1,5 +1,15 @@
 # jobportal
 
+## 4.1.0
+
+### Minor Changes
+
+- a2e9083: deploy to dev automated
+
+### Patch Changes
+
+- 1beee2d: reduce num of prod pods
+
 ## 4.0.1
 
 ### Patch Changes
