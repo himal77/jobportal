@@ -1,5 +1,11 @@
 # jobportal
 
+## 4.1.1
+
+### Patch Changes
+
+- 52a4e02: docker usename fix
+
 ## 4.1.0
 
 ### Minor Changes
