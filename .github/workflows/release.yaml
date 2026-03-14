@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [dev]
+    branches: [main]
 
 jobs:
   release:
@@ -11,6 +11,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.PAT_TOKEN }}
+          ref: main
           fetch-depth: 0
 
       - name: Fetch all branches
@@ -38,23 +39,37 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
-      - name: Sync version to pom.xml
-        if: steps.changesets.outputs.published == 'true'   # ← only when release PR is merged
+      - name: Check if changeset exists
+        id: check
         run: |
-          # get version from package.json (changesets updates this)
+          if [ -n "$(ls .changeset/*.md 2>/dev/null | grep -v README)" ]; then
+            echo "HAS_CHANGESET=true" >> $GITHUB_OUTPUT
+          else
+            echo "HAS_CHANGESET=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Version bump and push
+        if: steps.check.outputs.HAS_CHANGESET == 'true'
+        run: |
+          changeset version
           VERSION=$(node -p "require('./package.json').version")
-          echo "Syncing version $VERSION to pom.xml"
-          
-          # update pom.xml version
-          mvn versions:set -DnewVersion=$VERSION -DgenerateBackupPoms=false
-          
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Commit pom.xml version bump
-        if: steps.changesets.outputs.published == 'true'
-        run: |
           git config user.email 'ci@github.com'
           git config user.name 'GitHub Actions'
+          git add .
+          git commit -m "chore: release $VERSION [skip ci]"
+          git tag v$VERSION
+          git push origin main --follow-tags
+
+      - name: Sync version to pom.xml       # ← runs after version bump
+        if: steps.check.outputs.HAS_CHANGESET == 'true'
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          mvn versions:set -DnewVersion=$VERSION -DgenerateBackupPoms=false
+
+      - name: Commit pom.xml version bump
+        if: steps.check.outputs.HAS_CHANGESET == 'true'
+        run: |
           git add pom.xml
           git diff --staged --quiet || git commit -m "chore: bump pom.xml to ${{ env.VERSION }} [skip ci]"
-          git push origin dev
+          git push origin main
