@@ -1,20 +1,62 @@
+# dev
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: jobportal
+  name: jobportal-dev
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/himal77/jobportal   # ← your repo
+    repoURL: https://github.com/himal77/jobportal
     targetRevision: main
-    path: k8s                                        # ← folder with your manifests
+    path: k8s/overlays/dev
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: dev
   syncPolicy:
     automated:
-      prune: true       # ← deletes removed resources
-      selfHeal: true    # ← fixes manual changes
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+# staging
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jobportal-staging
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/himal77/jobportal
+    targetRevision: main
+    path: k8s/overlays/staging
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+# prod
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jobportal-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/himal77/jobportal
+    targetRevision: main
+    path: k8s/overlays/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod
+  syncPolicy:
     syncOptions:
       - CreateNamespace=true

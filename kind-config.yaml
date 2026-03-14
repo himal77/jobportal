@@ -4,8 +4,12 @@ nodes:
   - role: control-plane
     extraPortMappings:
       - containerPort: 30080
-        hostPort: 8080    # ← main (active version)
+        hostPort: 8080    # ← prod
       - containerPort: 30081
-        hostPort: 8081    # ← always blue
+        hostPort: 8081    # ← dev
       - containerPort: 30082
-        hostPort: 8082    # ← always green
+        hostPort: 8082    # ← staging
+      - containerPort: 30083
+        hostPort: 8083    # ← prod blue direct
+      - containerPort: 30084
+        hostPort: 8084    # ← prod green direct

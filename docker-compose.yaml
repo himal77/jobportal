@@ -1,20 +1,11 @@
-# docker-compose.yml
-version: '3.8'
 services:
-  app:
-    build: .
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
     ports:
-      - '8080:8080'
-    environment:
-      - SPRING_PROFILES_ACTIVE=dev
-    depends_on:
-      - postgres
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
 
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_DB: jobportal
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    ports:
-      - '5432:5432'
+volumes:
+  mongodb_data:

@@ -1,14 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: jobportal-blue
-  namespace: default
+  name: jobportal
+  namespace: staging
 spec:
   selector:
     app: jobportal
-    version: blue
   ports:
     - port: 8080
       targetPort: 8080
-      nodePort: 30081   # ← localhost:30081 (if kind config has this port)
+      nodePort: 30082
   type: NodePort
