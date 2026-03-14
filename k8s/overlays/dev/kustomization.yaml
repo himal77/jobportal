@@ -6,8 +6,7 @@ resources:
   - ../../base/common
 
 images:
-  - name: jobportal
-    newName: your-dockerhub-username/jobportal
+  - name: himal77/jobportal
     newTag: "4.1.1"
 
 patches:
