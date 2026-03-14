@@ -1,47 +1,54 @@
 name: Deploy Staging
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to deploy (e.g. 4.1.1)'
-        required: true
+  push:
+    branches: [ staging ]
+    paths-ignore:
+      - 'k8s/overlays/staging/**'   # ← avoid double trigger on kustomize commit
 
 env:
   DOCKER_IMAGE: himal77/jobportal
 
 jobs:
-  deploy-staging:
+  build-deploy-staging:
     runs-on: ubuntu-latest
-    environment: staging       # ← manual approval gate
     steps:
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.PAT_TOKEN }}
-          ref: main
           fetch-depth: 0
 
-      - name: Fetch all tags
-        run: git fetch --tags
-
-      - name: Validate version exists as git tag
+      - name: Get version
+        id: version
         run: |
-          VERSION=${{ github.event.inputs.version }}
-          if ! git tag | grep -q "^v$VERSION$"; then
-            echo "❌ Tag v$VERSION does not exist. Available tags:"
-            git tag | sort -V | tail -10    # ← shows last 10 tags
-            exit 1
-          fi
-          echo "✅ Tag v$VERSION exists"
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Update staging image tag
-        run: |
-          sed -i "s|newTag:.*|newTag: \"${{ github.event.inputs.version }}\"|" k8s/overlays/staging/kustomization.yaml
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
 
-      - name: Commit and push
+      - run: mvn clean package -DskipTests
+
+      - uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push
         run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          docker build -t $DOCKER_IMAGE:$VERSION .
+          docker push $DOCKER_IMAGE:$VERSION
+
+      - name: Update staging kustomization
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          sed -i "s|newTag:.*|newTag: \"$VERSION\"|" k8s/overlays/staging/kustomization.yaml
           git config user.email 'ci@github.com'
           git config user.name 'GitHub Actions'
           git add k8s/overlays/staging/kustomization.yaml
-          git commit -m "ci: deploy ${{ github.event.inputs.version }} to staging [skip ci]"
-          git push origin HEAD:main
+          git commit -m "chore: deploy ${{ steps.version.outputs.VERSION }} to staging [skip ci]"
+          git push origin staging
