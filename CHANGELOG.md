@@ -1,5 +1,11 @@
 # jobportal
 
+## 5.0.0
+
+### Major Changes
+
+- 1297f38: removed staging just dev and prod
+
 ## 4.4.0
 
 ### Minor Changes
