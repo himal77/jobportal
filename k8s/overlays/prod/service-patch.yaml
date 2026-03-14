@@ -5,7 +5,7 @@ metadata:
 spec:
   selector:
     app: jobportal
-    version: blue        # ← GitHub Actions changes this
+    version: green
   ports:
     - port: 8080
       targetPort: 8080
