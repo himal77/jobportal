@@ -1,5 +1,11 @@
 # jobportal
 
+## 4.3.1
+
+### Patch Changes
+
+- b8a5d6f: adjust release workflow
+
 ## 4.3.0
 
 ### Minor Changes
