@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: prod
 resources:
   - namespace.yaml
-  - ../../base/prod
+  - ../../base
 
 images:
   - name: himal77/jobportal

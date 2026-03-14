@@ -43,5 +43,5 @@ jobs:
           git config user.email 'ci@github.com'
           git config user.name 'GitHub Actions'
           git add k8s/overlays/prod/kustomization.yaml
-          git commit -m "ci: deploy ${{ github.event.inputs.version }} to staging [skip ci]"
+          git commit -m "ci: deploy ${{ github.event.inputs.version }} to prod [skip ci]"
           git push origin HEAD:main
