@@ -20,9 +20,12 @@ jobs:
           ref: dev
           fetch-depth: 0
 
-      - name: Set short SHA version
+      - name: Get version from tag
         id: version
-        run: echo "VERSION=dev-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}   # ← strips "refs/tags/v" from "refs/tags/v1.0.1"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Deploying version: $VERSION"
 
       - uses: actions/setup-java@v3
         with:
