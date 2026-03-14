@@ -1,5 +1,11 @@
 # jobportal
 
+## 4.2.2
+
+### Patch Changes
+
+- bd98c5a: customer version for prod
+
 ## 4.2.1
 
 ### Patch Changes
