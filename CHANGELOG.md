@@ -1,9 +1,15 @@
 # jobportal
 
+## 5.1.0
+
+### Minor Changes
+
+- 7faa316: version bump in pom.xml
+- 5fe5603: simpliefied
+
 ## 5.0.0
 
 ### Major Changes
-
 
 - 78f25ed: simplified workflow and deplyoment
 - 1297f38: removed staging just dev and prod
