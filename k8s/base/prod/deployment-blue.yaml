@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: jobportal
-          image: himal77/jobportal:3.3.0
+          image: himal77/jobportal:3.3.2
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
