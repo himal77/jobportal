@@ -1,5 +1,11 @@
 # jobportal
 
+## 5.1.1
+
+### Patch Changes
+
+- 70423b1: bump version in pom.xml
+
 ## 5.1.0
 
 ### Minor Changes
