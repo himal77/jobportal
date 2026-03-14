@@ -62,10 +62,5 @@ jobs:
           git add pom.xml
           git diff --staged --quiet && echo "pom.xml unchanged" || git commit -m "chore: sync pom.xml to $VERSION [skip ci]"
 
-          # create tag
-          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
-            echo "Tag v$VERSION already exists skipping"
-          else
-            git tag v$VERSION
-            git push origin main --follow-tags
-          fi
+          # push commits first
+          git push origin main
