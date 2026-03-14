@@ -20,28 +20,6 @@ spec:
     syncOptions:
       - CreateNamespace=true
 ---
-# staging
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: jobportal-staging
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/himal77/jobportal
-    targetRevision: main
-    path: k8s/overlays/staging
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: staging
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
----
 # prod
 apiVersion: argoproj.io/v1alpha1
 kind: Application

@@ -7,7 +7,7 @@ resources:
 
 images:
   - name: himal77/jobportal
-    newTag: "4.2.3"
+    newTag: "4.4.0"
 
 patches:
   - path: service-patch.yaml
