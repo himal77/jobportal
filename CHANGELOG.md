@@ -1,5 +1,11 @@
 # jobportal
 
+## 5.1.3
+
+### Patch Changes
+
+- a524160: release yaml fix
+
 ## 5.1.2
 
 ### Patch Changes
