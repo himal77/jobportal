@@ -4,6 +4,12 @@ namespace: staging
 resources:
   - namespace.yaml
   - ../../base/common
+
+images:
+  - name: jobportal
+    newName: your-dockerhub-username/jobportal
+    newTag: "3.3.2"
+
 patches:
   - path: service-patch.yaml
   - patch: |-

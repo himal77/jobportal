@@ -48,8 +48,8 @@ jobs:
           docker push $DOCKER_IMAGE:$VERSION
           docker push $DOCKER_IMAGE:latest
 
-  # ─── Job 2: Deploy ───────────────────────────────────────────────────────
-  deploy:
+    # ─── Job 2: Deploy to Dev (automatic) ────────────────────────────────────
+  deploy-dev:
     needs: docker
     runs-on: ubuntu-latest
     steps:
@@ -59,41 +59,15 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Get version from tag
-        id: version
+      - name: Update dev image tag
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Detect active color and switch
-        id: switch
-        run: |
-          CURRENT=$(grep 'version:' k8s/service.yaml | awk '{print $2}')
-          if [ "$CURRENT" = "blue" ]; then
-            NEW_COLOR="green"
-            STANDBY_COLOR="blue"
-          else
-            NEW_COLOR="blue"
-            STANDBY_COLOR="green"
-          fi
-          echo "NEW_COLOR=$NEW_COLOR" >> $GITHUB_OUTPUT
-          echo "STANDBY_COLOR=$STANDBY_COLOR" >> $GITHUB_OUTPUT
-
-      - name: Update new color with latest image
-        run: |
-          VERSION=${{ steps.version.outputs.VERSION }}
-          NEW_COLOR=${{ steps.switch.outputs.NEW_COLOR }}
-          sed -i 's|image:.*|image: '$DOCKER_IMAGE:$VERSION'|' k8s/deployment-$NEW_COLOR.yaml
-
-      - name: Switch service to new color
-        run: |
-          NEW_COLOR=${{ steps.switch.outputs.NEW_COLOR }}
-          sed -i "s|version:.*|version: $NEW_COLOR|" k8s/service.yaml
+          VERSION=${{ needs.docker.outputs.version }}
+          sed -i "s|newTag:.*|newTag: \"$VERSION\"|" k8s/overlays/dev/kustomization.yaml
 
       - name: Commit and push
         run: |
           git config user.email 'ci@github.com'
           git config user.name 'GitHub Actions'
-          git add k8s/
-          git commit -m "ci: switch to ${{ steps.switch.outputs.NEW_COLOR }} ${{ steps.version.outputs.VERSION }} [skip ci]"
+          git add k8s/overlays/dev/kustomization.yaml
+          git commit -m "ci: deploy ${{ needs.docker.outputs.version }} to dev [skip ci]"
           git push origin HEAD:main
