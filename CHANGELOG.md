@@ -1,5 +1,11 @@
 # jobportal
 
+## 4.3.0
+
+### Minor Changes
+
+- 8bf4d89: auto version release in pom
+
 ## 4.2.3
 
 ### Patch Changes
