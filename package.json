@@ -3,7 +3,7 @@
     "@changesets/cli": "^2.30.0"
   },
   "name": "jobportal",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "main": "index.js",
   "dependencies": {
     "ansi-colors": "^4.1.3",
