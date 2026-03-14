@@ -1,5 +1,17 @@
 # jobportal
 
+## 4.3.1
+
+### Patch Changes
+
+- b8a5d6f: adjust release workflow
+
+## 4.3.0
+
+### Minor Changes
+
+- 8bf4d89: auto version release in pom
+
 ## 4.2.3
 
 ### Patch Changes
